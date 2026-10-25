@@ -1,0 +1,289 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SplitEase</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .dash-hero{padding:24px 0 8px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+        .hero-left{flex:1;min-width:0}
+        .hero-greeting{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+        .hero-greeting h1{font-size:1.35rem;font-weight:800;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .hero-wave{font-size:1.4rem;animation:wave 2.5s infinite;transform-origin:70% 70%;display:inline-block}
+        @keyframes wave{0%,100%{transform:rotate(0)}10%{transform:rotate(14deg)}20%{transform:rotate(-8deg)}30%{transform:rotate(14deg)}40%{transform:rotate(-4deg)}50%{transform:rotate(10deg)}60%,100%{transform:rotate(0)}}
+        .hero-clock-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+        .hero-clock{font-size:12px;font-weight:700;color:var(--pri-a);background:var(--pri-s);padding:4px 10px;border-radius:8px;display:flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums}
+        .clock-dot{width:6px;height:6px;border-radius:50%;background:#10b981;animation:pulse-dot 2s infinite}
+        @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+        .hero-date{font-size:12px;color:var(--sub);font-weight:500}
+        .hero-tag{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600;margin-top:6px;display:inline-flex;align-items:center;gap:4px}
+        .tag-expense{background:rgba(239,68,68,.1);color:#ef4444}
+        .tag-income{background:rgba(16,185,129,.1);color:#10b981}
+        .tag-bal{background:rgba(99,102,241,.1);color:#6366f1}
+
+        .dash-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;box-shadow:0 4px 12px rgba(99,102,241,.35);cursor:pointer;text-decoration:none;flex-shrink:0;position:relative}
+        .avatar-pulse{position:absolute;inset:-3px;border-radius:50%;border:2px solid rgba(99,102,241,.3);animation:avatar-ring 3s infinite}
+        @keyframes avatar-ring{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.08);opacity:0}}
+
+        .finance-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+        .finance-card{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 12px;border-radius:16px;color:#fff;text-decoration:none;transition:all .25s;position:relative;overflow:hidden;text-align:center}
+        .finance-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+        .finance-card::after{content:'';position:absolute;top:-40px;right:-40px;width:100px;height:100px;background:rgba(255,255,255,.08);border-radius:50%}
+        .finance-balance{background:linear-gradient(135deg,#6366f1,#818cf8)}
+        .finance-income{background:linear-gradient(135deg,#10b981,#34d399)}
+        .finance-expense{background:linear-gradient(135deg,#ef4444,#f87171)}
+        .icon-3d{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.22);box-shadow:0 4px 12px rgba(0,0,0,.12),inset 0 1px 2px rgba(255,255,255,.3)}
+        .icon-3d svg{filter:drop-shadow(0 2px 4px rgba(0,0,0,.15))}
+        .finance-label{font-size:11px;opacity:.85;font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+        .finance-amount{font-size:1.2rem;font-weight:800;letter-spacing:-.02em}
+        .finance-sub{font-size:10px;opacity:.7;margin-top:2px}
+
+        .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+        .quick-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;background:var(--card);border:1px solid var(--bdr);border-radius:14px;text-decoration:none;color:var(--text);transition:all .2s;box-shadow:var(--shadow)}
+        .quick-btn:hover{border-color:var(--bdr-h);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+        .quick-btn .q-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+        .quick-btn .q-label{font-size:11px;font-weight:600;color:var(--text)}
+
+        .section{background:var(--card);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:16px}
+        .section-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--bdr)}
+        .section-head h3{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+        .section-head h3 .sh-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+        .view-all{font-size:11px;font-weight:600;color:var(--pri-a);text-decoration:none;padding:5px 10px;border-radius:8px;transition:background .15s}
+        .view-all:hover{background:var(--pri-s)}
+        .section-body{padding:4px 0}
+
+        .item-row{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--bdr);transition:background .12s}
+        .item-row:last-child{border:none}
+        .item-row:hover{background:var(--bg);transform:translateX(2px)}
+        a.item-row{text-decoration:none;color:inherit;cursor:pointer;transition:background .12s,transform .12s}
+        .item-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+        .item-details{flex:1;min-width:0}
+        .item-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .item-sub{font-size:11px;color:var(--sub);margin-top:1px}
+        .item-amount{font-size:13px;font-weight:700;flex-shrink:0}
+        .empty-state{padding:24px;text-align:center;color:var(--muted);font-size:12px}
+
+        .cat-food{background:rgba(245,158,11,.12);color:#f59e0b}
+        .cat-transport{background:rgba(99,102,241,.12);color:#6366f1}
+        .cat-entertainment{background:rgba(236,72,153,.12);color:#ec4899}
+        .cat-shopping{background:rgba(16,185,129,.12);color:#10b981}
+        .cat-bills{background:rgba(239,68,68,.12);color:#ef4444}
+        .cat-health{background:rgba(14,165,233,.12);color:#0ea5e9}
+        .cat-education{background:rgba(139,92,246,.12);color:#8b5cf6}
+        .cat-travel{background:rgba(6,182,212,.12);color:#06b6d4}
+        .cat-groceries{background:rgba(22,163,74,.12);color:#16a34a}
+        .cat-coffee{background:rgba(180,83,9,.12);color:#b45309}
+        .cat-rent{background:rgba(220,38,38,.12);color:#dc2626}
+        .cat-general{background:rgba(107,114,128,.12);color:#6b7280}
+        .cat-income{background:rgba(16,185,129,.12);color:#10b981}
+        .group-icon{background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff}
+        .icon-plus{background:rgba(99,102,241,.1);color:#6366f1}
+        .icon-wallet{background:rgba(245,158,11,.1);color:#f59e0b}
+        .icon-users{background:rgba(16,185,129,.1);color:#10b981}
+        .icon-chart{background:rgba(236,72,153,.1);color:#ec4899}
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <button class="nav-menu-btn" onclick="toggleDrawer()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="nav-brand">SplitEase</div>
+        <div class="nav-user">
+            <span id="userName"></span>
+            <button id="logoutBtn" class="btn btn-sm btn-outline">Logout</button>
+        </div>
+    </nav>
+
+    <div class="nav-drawer" id="navDrawer">
+        <div class="drawer-overlay" onclick="toggleDrawer()"></div>
+        <div class="drawer-panel">
+            <div class="drawer-header">
+                <div class="drawer-logo">SplitEase</div>
+                <button class="drawer-close" onclick="toggleDrawer()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="drawer-links">
+                <a href="/dashboard.html" class="drawer-link active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span>Home</span>
+                </a>
+                <a href="/groups.html" class="drawer-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span>Groups</span>
+                </a>
+                <a href="/settlements.html" class="drawer-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 7l-5-5-5 5"/></svg>
+                    <span>Settlements</span>
+                </a>
+                <a href="/balance.html" class="drawer-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                    <span>Balance</span>
+                </a>
+                <a href="/income.html" class="drawer-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 7l-5-5-5 5"/></svg>
+                    <span>Income</span>
+                </a>
+                <a href="/expenses.html" class="drawer-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    <span>Expenses</span>
+                </a>
+                <a href="/reports.html" class="drawer-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span>Reports</span>
+                </a>
+                <a href="/charts.html" class="drawer-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span>Charts</span>
+                </a>
+                <a href="/profile.html" class="drawer-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Profile</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content" style="padding-bottom:100px;">
+        <div class="dash-hero">
+            <div class="hero-left">
+                <div class="hero-greeting">
+                    <h1 id="welcomeMsg">Welcome back!</h1>
+                    <span class="hero-wave" id="heroWave">&#128075;</span>
+                </div>
+                <div class="hero-clock-row">
+                    <div class="hero-clock">
+                        <span class="clock-dot"></span>
+                        <span id="liveClock">00:00:00</span>
+                    </div>
+                    <span class="hero-date" id="liveDate"></span>
+                </div>
+                <div id="heroTag"></div>
+            </div>
+            <a href="/profile.html" class="dash-avatar" id="userAvatar">
+                <span class="avatar-pulse"></span>
+                K
+            </a>
+        </div>
+
+        <div class="finance-cards">
+            <a href="/balance.html" class="finance-card finance-balance">
+                <div class="icon-3d">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M12 15h.01"/></svg>
+                </div>
+                <div class="finance-label">Balance</div>
+                <div class="finance-amount" id="dashBalance">₹0</div>
+                <div class="finance-sub">Available to spend</div>
+            </a>
+            <a href="/income.html" class="finance-card finance-income">
+                <div class="icon-3d">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 7l-5-5-5 5"/></svg>
+                </div>
+                <div class="finance-label">Income</div>
+                <div class="finance-amount" id="dashIncome">₹0</div>
+                <div class="finance-sub" id="incomeCount">0 entries</div>
+            </a>
+            <a href="/expenses.html" class="finance-card finance-expense">
+                <div class="icon-3d">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12H3"/><path d="M7 16l-4-4 4-4"/></svg>
+                </div>
+                <div class="finance-label">Expenses</div>
+                <div class="finance-amount" id="dashExpenses">₹0</div>
+                <div class="finance-sub" id="expenseCount">0 entries</div>
+            </a>
+        </div>
+
+        <div class="quick-actions">
+            <a href="/income.html" class="quick-btn">
+                <div class="q-icon icon-wallet">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20"/><path d="M17 7l-5-5-5 5"/></svg>
+                </div>
+                <span class="q-label">Add Income</span>
+            </a>
+            <a href="/expenses.html" class="quick-btn">
+                <div class="q-icon icon-plus">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                </div>
+                <span class="q-label">Add Expense</span>
+            </a>
+            <a href="/groups.html" class="quick-btn">
+                <div class="q-icon icon-users">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <span class="q-label">Groups</span>
+            </a>
+            <a href="/reports.html" class="quick-btn">
+                <div class="q-icon icon-chart">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <span class="q-label">Reports</span>
+            </a>
+        </div>
+
+        <div class="section">
+            <div class="section-head">
+                <h3>
+                    <span class="sh-icon" style="background:rgba(16,185,129,.12)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    </span>
+                    My Groups
+                </h3>
+                <a href="/groups.html" class="view-all">View All</a>
+            </div>
+            <div class="section-body" id="recentGroups">
+                <p class="empty-state">No groups yet</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-head">
+                <h3>
+                    <span class="sh-icon" style="background:rgba(239,68,68,.12)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </span>
+                    Recent Transactions
+                </h3>
+                <a href="/expenses.html" class="view-all">View All</a>
+            </div>
+            <div class="section-body" id="recentExpenses">
+                <p class="empty-state">No transactions yet</p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/dashboard.html" class="bottom-nav-item active">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="/charts.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Charts</span>
+        </a>
+        <a href="/expenses.html" class="bottom-nav-item">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <span>Create</span>
+        </a>
+        <a href="/reports.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Reports</span>
+        </a>
+        <a href="/profile.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+    function toggleDrawer() {
+        document.getElementById('navDrawer').classList.toggle('open');
+    }
+    </script>
+</body>
+</html>

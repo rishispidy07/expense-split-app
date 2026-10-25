@@ -1,0 +1,290 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income - SplitEase</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .page-head{display:flex;align-items:center;justify-content:space-between;padding:32px 0 20px}
+        .page-head h1{font-size:1.4rem;font-weight:800}
+        .btn-add{display:flex;align-items:center;gap:6px;padding:10px 18px;border-radius:12px;background:linear-gradient(135deg,#10b981,#34d399);color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(16,185,129,.3);transition:all .2s}
+        .btn-add:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,185,129,.4)}
+
+        .stat-row{display:flex;gap:12px;margin-bottom:24px}
+        .stat-box{flex:1;background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:18px;text-align:center;box-shadow:var(--shadow)}
+        .stat-box .s-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+        .stat-box .s-val{font-size:1.2rem;font-weight:800;color:var(--text)}
+        .stat-box .s-lbl{font-size:11px;color:var(--sub);font-weight:500;margin-top:2px}
+
+        .card{background:var(--card);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);margin:0 0 20px}
+        .card-body{padding:4px 0}
+        .item-row{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--bdr);transition:background .12s}
+        .item-row:last-child{border:none}
+        .item-row:hover{background:var(--bg)}
+        .item-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+        .item-details{flex:1;min-width:0}
+        .item-name{font-size:14px;font-weight:600;color:var(--text)}
+        .item-sub{font-size:12px;color:var(--sub);margin-top:1px}
+        .item-amount{font-size:14px;font-weight:700;flex-shrink:0;color:#10b981}
+        .item-del{padding:4px 10px;border-radius:8px;border:1.5px solid var(--red);color:var(--red);background:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;flex-shrink:0}
+        .item-del:hover{background:var(--red);color:#fff}
+        .empty-state{padding:32px;text-align:center;color:var(--muted);font-size:13px}
+
+        .icon-salary{background:rgba(16,185,129,.12);color:#10b981}
+        .icon-freelance{background:rgba(99,102,241,.12);color:#6366f1}
+        .icon-gift{background:rgba(236,72,153,.12);color:#ec4899}
+        .icon-refund{background:rgba(245,158,11,.12);color:#f59e0b}
+        .icon-invest{background:rgba(139,92,246,.12);color:#8b5cf6}
+        .icon-other{background:rgba(107,114,128,.12);color:#6b7280}
+
+        .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:200}
+        .modal-content{background:var(--card);border-radius:16px;padding:28px;width:90%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+        .modal-header h2{font-size:1.1rem;font-weight:700}
+        .modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--sub);padding:4px}
+        .form-group{margin-bottom:16px}
+        .form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)}
+        .form-group input,.form-group select{width:100%;padding:12px 14px;border:1.5px solid var(--bdr);border-radius:10px;font-size:14px;font-family:inherit;transition:border .15s}
+        .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--pri-a);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+        .error-message{color:var(--red);font-size:13px;margin-bottom:12px;display:none}
+        .btn-full{width:100%;padding:12px;font-size:14px;font-weight:600;border:none;border-radius:10px;cursor:pointer;font-family:inherit}
+        .btn-primary{background:var(--pri-a);color:#fff}
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <button class="nav-menu-btn" onclick="toggleDrawer()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="nav-brand">SplitEase</div>
+        <div class="nav-user">
+            <span id="userName"></span>
+            <button id="logoutBtn" class="btn btn-sm btn-outline">Logout</button>
+        </div>
+    </nav>
+
+<div class="nav-drawer" id="navDrawer">
+    <div class="drawer-overlay" onclick="toggleDrawer()"></div>
+    <div class="drawer-panel">
+        <div class="drawer-header">
+            <div class="drawer-logo">SplitEase</div>
+            <button class="drawer-close" onclick="toggleDrawer()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="drawer-links">
+            <a href="/dashboard.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Home</span>
+            </a>
+            <a href="/groups.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Groups</span>
+            </a>
+            <a href="/settlements.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 7l-5-5-5 5"/></svg>
+                <span>Settlements</span>
+            </a>
+            <a href="/balance.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                <span>Balance</span>
+            </a>
+            <a href="/income.html" class="drawer-link active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 7l-5-5-5 5"/></svg>
+                <span>Income</span>
+            </a>
+            <a href="/expenses.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                <span>Expenses</span>
+            </a>
+            <a href="/reports.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Reports</span>
+            </a>
+            <a href="/charts.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Charts</span>
+            </a>
+            <a href="/profile.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Profile</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+    <div class="main-content" style="padding-bottom:80px;">
+        <div class="page-head">
+            <h1>Income</h1>
+            <button class="btn-add" onclick="showModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Income
+            </button>
+        </div>
+
+        <div class="stat-row">
+            <div class="stat-box">
+                <div class="s-icon" style="background:rgba(16,185,129,.12)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2"><path d="M12 2v20"/><path d="M17 7l-5-5-5 5"/></svg>
+                </div>
+                <div class="s-val" id="totalIncome">&#8377;0</div>
+                <div class="s-lbl">Total Income</div>
+            </div>
+            <div class="stat-box">
+                <div class="s-icon" style="background:rgba(99,102,241,.12)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div class="s-val" id="incomeCount">0</div>
+                <div class="s-lbl">Entries</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body" id="incomeList">
+                <p class="empty-state">No income yet</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="incomeModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Income</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="incDesc">Description</label>
+                <input type="text" id="incDesc" placeholder="e.g. September salary">
+            </div>
+            <div class="form-group">
+                <label for="incAmount">Amount (&#8377;)</label>
+                <input type="number" id="incAmount" placeholder="0.00" step="0.01" min="0.01">
+            </div>
+            <div class="form-group">
+                <label for="incCategory">Source</label>
+                <select id="incCategory">
+                    <option value="Salary">Salary</option>
+                    <option value="Freelance">Freelance</option>
+                    <option value="Gift">Gift</option>
+                    <option value="Refund">Refund</option>
+                    <option value="Investment">Investment</option>
+                    <option value="Income">Other</option>
+                </select>
+            </div>
+            <div id="incError" class="error-message" style="display:none;"></div>
+            <button class="btn-full btn-primary" onclick="createIncome()">Add Income</button>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/dashboard.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="/charts.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Charts</span>
+        </a>
+        <a href="/expenses.html" class="bottom-nav-item">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <span>Create</span>
+        </a>
+        <a href="/reports.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Reports</span>
+        </a>
+        <a href="/profile.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script src="/js/api.js"></script>
+    <script>
+    const srcIcons = {
+        Salary:{cls:'icon-salary',icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>'},
+        Freelance:{cls:'icon-freelance',icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'},
+        Gift:{cls:'icon-gift',icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>'},
+        Refund:{cls:'icon-refund',icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>'},
+        Investment:{cls:'icon-invest',icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>'},
+        Income:{cls:'icon-other',icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>'}
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (!API.requireAuth()) return;
+        const user = API.getUser();
+        document.getElementById('userName').textContent = user ? user.fullName || user.username : '';
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await API.post('/api/auth/logout');
+            API.clearToken();
+            window.location.href = '/login.html';
+        });
+        await loadIncome();
+    });
+
+    async function loadIncome() {
+        const res = await API.get('/api/expenses');
+        const expenses = res && res.success ? res.expenses : [];
+        const income = expenses.filter(e => e.category === 'Income');
+        const total = income.reduce((s, e) => s + Math.abs(e.amount), 0);
+
+        document.getElementById('totalIncome').textContent = '\u20B9' + total.toLocaleString('en-IN');
+        document.getElementById('incomeCount').textContent = income.length;
+
+        const container = document.getElementById('incomeList');
+        if (income.length === 0) {
+            container.innerHTML = '<p class="empty-state">No income yet</p>';
+            return;
+        }
+        container.innerHTML = income.map(e => {
+            const cat = srcIcons[e.description.split(':')[0].trim()] || srcIcons.Income;
+            const date = new Date(e.createdAt).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
+            return `<div class="item-row">
+                <div class="item-icon ${cat.cls}">${cat.icon}</div>
+                <div class="item-details">
+                    <div class="item-name">${escapeHtml(e.description)}</div>
+                    <div class="item-sub">${date}</div>
+                </div>
+                <span class="item-amount">+\u20B9${Math.abs(e.amount).toLocaleString('en-IN')}</span>
+                <button class="item-del" onclick="deleteIncome(${e.id})">Del</button>
+            </div>`;
+        }).join('');
+    }
+
+    function showModal() { document.getElementById('incomeModal').style.display = 'flex'; }
+    function closeModal() {
+        document.getElementById('incomeModal').style.display = 'none';
+        document.getElementById('incError').style.display = 'none';
+    }
+    async function createIncome() {
+        const desc = document.getElementById('incDesc').value.trim();
+        const amount = parseFloat(document.getElementById('incAmount').value);
+        const category = document.getElementById('incCategory').value;
+        const errDiv = document.getElementById('incError');
+        if (!desc) { errDiv.textContent = 'Enter a description'; errDiv.style.display = 'block'; return; }
+        if (!amount || amount <= 0) { errDiv.textContent = 'Enter a valid amount'; errDiv.style.display = 'block'; return; }
+        const now = new Date();
+        const res = await API.post('/api/expenses', {
+            description: category + ': ' + desc, amount, category: 'Income',
+            splitType: 'equal', year: now.getFullYear(), month: now.getMonth() + 1
+        });
+        if (res && res.success) { closeModal(); document.getElementById('incDesc').value = ''; document.getElementById('incAmount').value = ''; await loadIncome(); }
+        else { errDiv.textContent = res ? res.message : 'Failed'; errDiv.style.display = 'block'; }
+    }
+    async function deleteIncome(id) {
+        if (!confirm('Delete this income entry?')) return;
+        const res = await API.del('/api/expenses/' + id);
+        if (res && res.success) await loadIncome();
+    }
+    function escapeHtml(s) { if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+    </script>
+    <script>
+function toggleDrawer() {
+    document.getElementById('navDrawer').classList.toggle('open');
+}
+</script>
+</body>
+</html>

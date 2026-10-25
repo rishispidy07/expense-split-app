@@ -1,0 +1,122 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balance - SplitEase</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">SplitEase</div>
+        <div class="nav-links">
+            <a href="/dashboard.html" class="nav-link">Home</a>
+        </div>
+    </nav>
+
+    <div class="main-content" style="padding-bottom: 80px;">
+        <div class="page-header">
+            <h1>Balance</h1>
+        </div>
+
+        <div class="balance-hero">
+            <div class="balance-label">Personal Balance</div>
+            <div class="balance-amount" id="personalBalance">&#8377;0</div>
+            <div class="balance-sub" id="balanceStatus">Loading...</div>
+        </div>
+
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="summary-label">Total Income</div>
+                <div class="summary-amount" id="totalIncome" style="color:var(--grn)">&#8377;0</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Total Spent</div>
+                <div class="summary-amount" id="totalSpent" style="color:var(--red)">&#8377;0</div>
+            </div>
+        </div>
+
+        <div class="report-section">
+            <h3>Group Wallets</h3>
+            <div id="groupWallets" class="report-list">
+                <p class="empty-state">No groups yet</p>
+            </div>
+        </div>
+
+        <div class="report-section">
+            <h3>Recent Transactions</h3>
+            <div id="recentTxns" class="report-list">
+                <p class="empty-state">No transactions yet</p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/dashboard.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="/charts.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Charts</span>
+        </a>
+        <a href="/expenses.html" class="bottom-nav-item">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <span>Create</span>
+        </a>
+        <a href="/reports.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Reports</span>
+        </a>
+        <a href="/profile.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script src="/js/api.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (!API.requireAuth()) return;
+        const user = API.getUser();
+        const bal = user ? user.balance || 0 : 0;
+        document.getElementById('personalBalance').textContent = '\u20B9' + bal.toLocaleString('en-IN');
+        document.getElementById('balanceStatus').textContent = bal >= 0 ? 'You have funds available' : 'You owe money';
+
+        const [expRes, grpRes] = await Promise.all([
+            API.get('/api/expenses'),
+            API.get('/api/groups')
+        ]);
+
+        const expenses = expRes && expRes.success ? expRes.expenses : [];
+        const groups = grpRes && grpRes.success ? grpRes.groups : [];
+
+        const income = expenses.filter(e => e.category === 'Income').reduce((s,e) => s + Math.abs(e.amount), 0);
+        const spent = expenses.filter(e => e.category !== 'Income').reduce((s,e) => s + e.amount, 0);
+        document.getElementById('totalIncome').textContent = '\u20B9' + income.toLocaleString('en-IN');
+        document.getElementById('totalSpent').textContent = '\u20B9' + spent.toLocaleString('en-IN');
+
+        const gwDiv = document.getElementById('groupWallets');
+        if (groups.length === 0) {
+            gwDiv.innerHTML = '<p class="empty-state">No groups yet</p>';
+        } else {
+            gwDiv.innerHTML = groups.map(g => '<div class="report-row"><span class="report-label">' + escapeHtml(g.name) + '</span><span class="report-value" style="color:var(--grn)">\u20B9' + (g.walletBalance||0).toLocaleString('en-IN') + '</span></div>').join('');
+        }
+
+        const txDiv = document.getElementById('recentTxns');
+        const recent = expenses.slice(0, 10);
+        if (recent.length === 0) {
+            txDiv.innerHTML = '<p class="empty-state">No transactions yet</p>';
+        } else {
+            txDiv.innerHTML = recent.map(e => {
+                const isIncome = e.category === 'Income';
+                return '<div class="report-row"><span class="report-label">' + escapeHtml(e.description) + '<br><small class="text-muted">' + escapeHtml(e.category||'General') + ' &middot; ' + new Date(e.createdAt).toLocaleDateString('en-IN') + '</small></span><span class="report-value" style="color:' + (isIncome?'var(--grn)':'var(--red)') + '">' + (isIncome?'+':'-') + '\u20B9' + Math.abs(e.amount).toLocaleString('en-IN') + '</span></div>';
+            }).join('');
+        }
+    });
+    function escapeHtml(s) { if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+    </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+    "java.project.sourcePaths": ["backend/src"],
+    "java.project.outputPath": "backend/bin",
+    "java.project.referencedLibraries": ["backend/lib/*"],
+    "editor.formatOnSave": false,
+    "files.exclude": {
+        "backend/bin/**": true,
+        "backend/classes/**": true,
+        "backend/out/**": true,
+        "backend/build/**": true,
+        "**/*.class": true
+    }
+}

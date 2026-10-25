@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balance - SplitEase</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .bal-hero{text-align:center;padding:40px 20px 32px}
+        .bal-hero .icon-wrap{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#6366f1,#818cf8);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 24px rgba(99,102,241,.3),inset 0 2px 4px rgba(255,255,255,.2)}
+        .bal-hero .icon-wrap svg{filter:drop-shadow(0 2px 4px rgba(0,0,0,.15))}
+        .bal-hero .amount{font-size:2.2rem;font-weight:800;color:var(--text);letter-spacing:-.03em}
+        .bal-hero .label{font-size:13px;color:var(--sub);margin-top:2px}
+        .bal-actions{display:flex;gap:12px;margin:0 20px 28px}
+        .bal-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:14px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;border:none;transition:all .2s}
+        .bal-deposit{background:linear-gradient(135deg,#10b981,#34d399);color:#fff;box-shadow:0 4px 12px rgba(16,185,129,.3)}
+        .bal-deposit:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,185,129,.4)}
+        .bal-withdraw{background:var(--card);color:var(--red);border:1.5px solid var(--red)}
+        .bal-withdraw:hover{background:var(--red);color:#fff}
+
+        .card{background:var(--card);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);margin:0 20px 20px}
+        .card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--bdr)}
+        .card-header h3{font-size:15px;font-weight:700}
+        .card-body{padding:4px 0}
+        .item-row{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--bdr);transition:background .12s}
+        .item-row:last-child{border:none}
+        .item-row:hover{background:var(--bg)}
+        .item-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+        .item-details{flex:1;min-width:0}
+        .item-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .item-sub{font-size:12px;color:var(--sub);margin-top:1px}
+        .item-amount{font-size:14px;font-weight:700;flex-shrink:0}
+        .empty-state{padding:32px;text-align:center;color:var(--muted);font-size:13px}
+
+        .icon-deposit{background:rgba(16,185,129,.12);color:#10b981}
+        .icon-withdraw{background:rgba(239,68,68,.12);color:#ef4444}
+        .icon-expense{background:rgba(245,158,11,.12);color:#f59e0b}
+
+        .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:200}
+        .modal-content{background:var(--card);border-radius:16px;padding:28px;width:90%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+        .modal-header h2{font-size:1.1rem;font-weight:700}
+        .modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--sub);padding:4px}
+        .form-group{margin-bottom:16px}
+        .form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)}
+        .form-group input,.form-group select{width:100%;padding:12px 14px;border:1.5px solid var(--bdr);border-radius:10px;font-size:14px;font-family:inherit;transition:border .15s}
+        .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--pri-a);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+        .error-message{color:var(--red);font-size:13px;margin-bottom:12px;display:none}
+        .btn-full{width:100%;padding:12px;font-size:14px;font-weight:600;border:none;border-radius:10px;cursor:pointer;font-family:inherit}
+        .btn-primary{background:var(--pri-a);color:#fff}
+        .btn-primary:hover{background:var(--pri-h)}
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <button class="nav-menu-btn" onclick="toggleDrawer()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="nav-brand">SplitEase</div>
+        <div class="nav-user">
+            <span id="userName"></span>
+            <button id="logoutBtn" class="btn btn-sm btn-outline">Logout</button>
+        </div>
+    </nav>
+
+<div class="nav-drawer" id="navDrawer">
+    <div class="drawer-overlay" onclick="toggleDrawer()"></div>
+    <div class="drawer-panel">
+        <div class="drawer-header">
+            <div class="drawer-logo">SplitEase</div>
+            <button class="drawer-close" onclick="toggleDrawer()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="drawer-links">
+            <a href="/dashboard.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Home</span>
+            </a>
+            <a href="/groups.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Groups</span>
+            </a>
+            <a href="/settlements.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 7l-5-5-5 5"/></svg>
+                <span>Settlements</span>
+            </a>
+            <a href="/balance.html" class="drawer-link active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                <span>Balance</span>
+            </a>
+            <a href="/income.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 7l-5-5-5 5"/></svg>
+                <span>Income</span>
+            </a>
+            <a href="/expenses.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                <span>Expenses</span>
+            </a>
+            <a href="/reports.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Reports</span>
+            </a>
+            <a href="/charts.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Charts</span>
+            </a>
+            <a href="/profile.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Profile</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+    <div class="main-content" style="padding-bottom:80px;">
+        <div class="bal-hero">
+            <div class="icon-wrap">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2"/>
+                    <path d="M2 10h20"/>
+                    <path d="M12 15h.01"/>
+                </svg>
+            </div>
+            <div class="amount" id="personalBalance">&#8377;0</div>
+            <div class="label" id="balanceStatus">Loading...</div>
+        </div>
+
+        <div class="bal-actions">
+            <button class="bal-btn bal-deposit" onclick="showModal('deposit')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Deposit
+            </button>
+            <button class="bal-btn bal-withdraw" onclick="showModal('withdraw')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Withdraw
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Recent Transactions</h3>
+            </div>
+            <div id="recentTxns" class="card-body">
+                <p class="empty-state">No transactions yet</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="balModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Deposit</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="balAmount">Amount (&#8377;)</label>
+                <input type="number" id="balAmount" placeholder="0.00" step="0.01" min="0.01">
+            </div>
+            <div id="balError" class="error-message" style="display:none;"></div>
+            <button class="btn-full btn-primary" onclick="submitBalance()">Confirm</button>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/dashboard.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="/charts.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Charts</span>
+        </a>
+        <a href="/expenses.html" class="bottom-nav-item">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <span>Create</span>
+        </a>
+        <a href="/reports.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Reports</span>
+        </a>
+        <a href="/profile.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script src="/js/api.js"></script>
+    <script>
+    const catIcons = {
+        Income: {cls:'icon-deposit',icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20"/><path d="M17 7l-5-5-5 5"/></svg>'},
+        Food: {cls:'icon-expense',icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>'},
+        Transport: {cls:'icon-expense',icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="1" y="3" width="15" height="13" rx="2"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>'},
+        default: {cls:'icon-expense',icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>'}
+    };
+    let currentAction = 'deposit';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (!API.requireAuth()) return;
+        const user = API.getUser();
+        document.getElementById('userName').textContent = user ? user.fullName || user.username : '';
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await API.post('/api/auth/logout');
+            API.clearToken();
+            window.location.href = '/login.html';
+        });
+        await loadBalance();
+    });
+
+    async function loadBalance() {
+        const res = await API.get('/api/balance');
+        const bal = res && res.success ? res.balance : 0;
+        document.getElementById('personalBalance').textContent = '\u20B9' + bal.toLocaleString('en-IN');
+        document.getElementById('balanceStatus').textContent = bal >= 0 ? 'Available to spend' : 'You owe money';
+
+        const expRes = await API.get('/api/expenses');
+        const expenses = expRes && expRes.success ? expRes.expenses : [];
+        const txDiv = document.getElementById('recentTxns');
+        if (expenses.length === 0) {
+            txDiv.innerHTML = '<p class="empty-state">No transactions yet</p>';
+        } else {
+            txDiv.innerHTML = expenses.slice(0, 15).map(e => {
+                const isIncome = e.category === 'Income';
+                const cat = catIcons[e.category] || catIcons.default;
+                const date = new Date(e.createdAt).toLocaleDateString('en-IN', {day:'numeric',month:'short'});
+                return `<div class="item-row">
+                    <div class="item-icon ${cat.cls}">${cat.icon}</div>
+                    <div class="item-details">
+                        <div class="item-name">${escapeHtml(e.description)}</div>
+                        <div class="item-sub">${escapeHtml(e.category||'General')} \u00B7 ${date}</div>
+                    </div>
+                    <span class="item-amount" style="color:${isIncome?'#10b981':'#ef4444'}">${isIncome?'+':'-'}\u20B9${Math.abs(e.amount).toLocaleString('en-IN')}</span>
+                </div>`;
+            }).join('');
+        }
+    }
+
+    function showModal(action) {
+        currentAction = action;
+        document.getElementById('modalTitle').textContent = action === 'deposit' ? 'Deposit Money' : 'Withdraw Money';
+        document.getElementById('balModal').style.display = 'flex';
+    }
+    function closeModal() {
+        document.getElementById('balModal').style.display = 'none';
+        document.getElementById('balError').style.display = 'none';
+        document.getElementById('balAmount').value = '';
+    }
+    async function submitBalance() {
+        const amount = parseFloat(document.getElementById('balAmount').value);
+        const errDiv = document.getElementById('balError');
+        if (!amount || amount <= 0) { errDiv.textContent = 'Enter a valid amount'; errDiv.style.display = 'block'; return; }
+        const res = await API.post('/api/balance', { action: currentAction, amount, description: currentAction });
+        if (res && res.success) { closeModal(); await loadBalance(); }
+        else { errDiv.textContent = res ? res.message : 'Failed'; errDiv.style.display = 'block'; }
+    }
+    function escapeHtml(s) { if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+    </script>
+    <script>
+function toggleDrawer() {
+    document.getElementById('navDrawer').classList.toggle('open');
+}
+</script>
+</body>
+</html>

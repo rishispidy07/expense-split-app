@@ -1,0 +1,2 @@
+Error: Could not find or load main class Project\expense-split-app\backend\out;C:\Users\KARTHIK\Documents\Default
+Caused by: java.lang.ClassNotFoundException: Project\expense-split-app\backend\out;C:\Users\KARTHIK\Documents\Default

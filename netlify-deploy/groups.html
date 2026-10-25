@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groups - SplitEase</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .group-card{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:18px;margin-bottom:12px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow)}
+        .group-card:hover{border-color:var(--bdr-h);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+        .group-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+        .group-card h3{font-size:15px;font-weight:700;color:var(--text);margin:0}
+        .group-card p{font-size:12px;color:var(--sub);margin:0 0 10px}
+        .group-meta{display:flex;align-items:center;gap:10px}
+        .wallet-badge{font-size:13px;font-weight:700;color:#6366f1;background:rgba(99,102,241,.1);padding:4px 10px;border-radius:8px}
+        .role-badge{font-size:11px;font-weight:600;color:var(--sub);text-transform:capitalize}
+        .group-edit-btn{width:32px;height:32px;border-radius:8px;border:none;background:rgba(99,102,241,.1);color:#6366f1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+        .group-edit-btn:hover{background:#6366f1;color:#fff}
+
+        .detail-top{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--bdr)}
+        .detail-icon{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .detail-info{flex:1;min-width:0}
+        .detail-name{font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px}
+        .detail-desc{font-size:12px;color:var(--sub)}
+        .detail-wallet{text-align:right}
+        .detail-wallet-label{font-size:10px;color:var(--sub);text-transform:uppercase;font-weight:600}
+        .detail-wallet-amount{font-size:18px;font-weight:800;color:#6366f1}
+
+        .group-tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
+        .tab-btn{padding:8px 14px;border-radius:10px;border:1px solid var(--bdr);background:var(--card);color:var(--sub);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;font-family:inherit}
+        .tab-btn.active{background:#6366f1;color:#fff;border-color:#6366f1}
+        .tab-btn:hover:not(.active){border-color:var(--bdr-h)}
+
+        .tab-content{min-height:200px}
+
+        .member-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border-radius:10px;margin-bottom:8px}
+        .member-info{display:flex;align-items:center;gap:10px}
+        .member-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+        .member-name{font-size:13px;font-weight:600;color:var(--text)}
+        .member-role{font-size:11px;color:var(--sub);margin-top:1px}
+        .member-remove{width:28px;height:28px;border-radius:8px;border:none;background:rgba(239,68,68,.08);color:#ef4444;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+        .member-remove:hover{background:#ef4444;color:#fff}
+        .add-member-form{display:flex;gap:8px;margin-bottom:14px}
+        .add-member-form input{flex:1;padding:10px 14px;border-radius:10px;border:1px solid var(--bdr);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit}
+        .add-member-form input:focus{outline:none;border-color:#6366f1}
+
+        .split-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+        .split-card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px;text-align:center}
+        .split-val{font-size:17px;font-weight:800;color:var(--text)}
+        .split-lbl{font-size:10px;color:var(--sub);margin-top:2px;font-weight:500;text-transform:uppercase}
+
+        .person-card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:10px}
+        .person-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+        .person-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+        .person-name{font-size:13px;font-weight:600;color:var(--text)}
+        .person-status{font-size:12px;font-weight:600}
+        .person-bars{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+        .bar-group label{font-size:10px;color:var(--sub);display:flex;justify-content:space-between;margin-bottom:3px}
+        .bar-group label span{font-weight:600;color:var(--text)}
+        .bar-track{height:5px;background:var(--bdr);border-radius:3px;overflow:hidden}
+        .bar-fill{height:100%;border-radius:3px;transition:width .5s}
+
+        .settle-item{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border:1px solid var(--bdr);border-radius:10px;margin-bottom:6px}
+        .settle-from{font-size:12px;font-weight:600;color:#ef4444;min-width:70px}
+        .settle-arrow{color:var(--muted);flex-shrink:0}
+        .settle-amt{flex:1;text-align:center;font-size:14px;font-weight:700;color:var(--text)}
+        .settle-to{font-size:12px;font-weight:600;color:#10b981;min-width:70px;text-align:right}
+
+        .exp-item{padding:12px 14px;background:var(--card);border:1px solid var(--bdr);border-radius:10px;margin-bottom:8px}
+        .exp-top{display:flex;justify-content:space-between;align-items:start;margin-bottom:4px}
+        .exp-desc{font-size:13px;font-weight:600;color:var(--text)}
+        .exp-cat{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:6px}
+        .exp-amount{font-size:14px;font-weight:700;color:var(--text);flex-shrink:0}
+        .exp-meta{font-size:11px;color:var(--sub)}
+        .exp-splits{font-size:11px;color:var(--sub);margin-top:4px;padding-top:4px;border-top:1px dashed var(--bdr)}
+
+        .section-title{font-size:13px;font-weight:700;color:var(--text);margin:16px 0 10px;display:flex;align-items:center;gap:6px}
+        .section-title svg{opacity:.5}
+        .empty-msg{text-align:center;padding:24px;color:var(--muted);font-size:12px}
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <button class="nav-menu-btn" onclick="toggleDrawer()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="nav-brand">SplitEase</div>
+        <div class="nav-user">
+            <span id="userName"></span>
+            <button id="logoutBtn" class="btn btn-sm btn-outline">Logout</button>
+        </div>
+    </nav>
+
+<div class="nav-drawer" id="navDrawer">
+    <div class="drawer-overlay" onclick="toggleDrawer()"></div>
+    <div class="drawer-panel">
+        <div class="drawer-header">
+            <div class="drawer-logo">SplitEase</div>
+            <button class="drawer-close" onclick="toggleDrawer()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="drawer-links">
+            <a href="/dashboard.html" class="drawer-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></a>
+            <a href="/groups.html" class="drawer-link active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Groups</span></a>
+            <a href="/settlements.html" class="drawer-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 7l-5-5-5 5"/></svg><span>Settlements</span></a>
+            <a href="/balance.html" class="drawer-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Balance</span></a>
+            <a href="/expenses.html" class="drawer-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Expenses</span></a>
+            <a href="/reports.html" class="drawer-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Reports</span></a>
+            <a href="/charts.html" class="drawer-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Charts</span></a>
+            <a href="/profile.html" class="drawer-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></a>
+        </div>
+    </div>
+</div>
+
+    <div class="main-content" style="padding-bottom:80px">
+        <div class="page-header">
+            <h1>Groups</h1>
+            <button id="createGroupBtn" class="btn btn-primary">+ New Group</button>
+        </div>
+
+        <div id="groupsList"></div>
+
+        <div id="createGroupModal" class="modal" style="display:none">
+            <div class="modal-content">
+                <div class="modal-header"><h2>New Group</h2><button class="modal-close" onclick="closeModal('createGroupModal')">&times;</button></div>
+                <form id="createGroupForm">
+                    <div class="form-group"><label for="groupName">Name</label><input type="text" id="groupName" required placeholder="Group name"></div>
+                    <div class="form-group"><label for="groupDesc">Description</label><textarea id="groupDesc" rows="2" placeholder="What's this group for?"></textarea></div>
+                    <button type="submit" class="btn btn-primary btn-full">Create</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="editGroupModal" class="modal" style="display:none">
+            <div class="modal-content">
+                <div class="modal-header"><h2>Edit Group</h2><button class="modal-close" onclick="closeModal('editGroupModal')">&times;</button></div>
+                <form id="editGroupForm">
+                    <input type="hidden" id="editGroupId">
+                    <div class="form-group"><label for="editGroupName">Name</label><input type="text" id="editGroupName" required placeholder="Group name"></div>
+                    <div class="form-group"><label for="editGroupDesc">Description</label><textarea id="editGroupDesc" rows="2" placeholder="Description"></textarea></div>
+                    <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="groupDetailModal" class="modal" style="display:none">
+            <div class="modal-content modal-lg">
+                <div class="modal-header"><h2 id="groupDetailName">Group</h2><button class="modal-close" onclick="closeModal('groupDetailModal')">&times;</button></div>
+                <div class="detail-top">
+                    <div class="detail-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                    <div class="detail-info"><div class="detail-name" id="detailGroupName"></div><div class="detail-desc" id="detailGroupDesc"></div></div>
+                    <div class="detail-wallet"><div class="detail-wallet-label">Wallet</div><div class="detail-wallet-amount" id="groupWalletBalance">₹0</div></div>
+                </div>
+
+                <div class="group-tabs">
+                    <button class="tab-btn active" onclick="showTab('splits',this)">Splits</button>
+                    <button class="tab-btn" onclick="showTab('members',this)">Members</button>
+                    <button class="tab-btn" onclick="showTab('balances',this)">Balances</button>
+                    <button class="tab-btn" onclick="showTab('wallet',this)">Wallet</button>
+                    <button class="tab-btn" onclick="showTab('expenses',this)">Expenses</button>
+                </div>
+
+                <div id="tab-splits" class="tab-content">
+                    <div id="splitsContent"></div>
+                </div>
+
+                <div id="tab-members" class="tab-content" style="display:none">
+                    <div class="add-member-form">
+                        <input type="text" id="addMemberUsername" placeholder="Username">
+                        <button onclick="addMember()" class="btn btn-sm btn-primary">Add</button>
+                    </div>
+                    <div id="membersList"></div>
+                </div>
+
+                <div id="tab-balances" class="tab-content" style="display:none">
+                    <div id="balancesList"></div>
+                </div>
+
+                <div id="tab-wallet" class="tab-content" style="display:none">
+                    <div class="wallet-actions">
+                        <div class="wallet-action"><input type="number" id="depositAmount" placeholder="Amount" step="0.01" min="0.01"><button onclick="depositToWallet()" class="btn btn-sm btn-primary">Deposit</button></div>
+                        <div class="wallet-action"><input type="number" id="withdrawAmount" placeholder="Amount" step="0.01" min="0.01"><button onclick="withdrawFromWallet()" class="btn btn-sm btn-outline">Withdraw</button></div>
+                    </div>
+                    <div id="walletTransactions"></div>
+                </div>
+
+                <div id="tab-expenses" class="tab-content" style="display:none">
+                    <button onclick="showAddExpense()" class="btn btn-sm btn-primary">+ Expense</button>
+                    <div id="addExpenseForm" style="display:none;margin:10px 0;padding:12px;background:var(--bg);border-radius:10px">
+                        <div class="form-group"><input type="text" id="expenseDesc" placeholder="Description" required></div>
+                        <div class="form-group"><input type="number" id="expenseAmount" placeholder="Amount" step="0.01" min="0.01" required></div>
+                        <div class="form-group"><select id="expenseCategory"><option value="General">General</option><option value="Food">Food</option><option value="Transport">Transport</option><option value="Entertainment">Entertainment</option><option value="Shopping">Shopping</option><option value="Bills">Bills</option></select></div>
+                        <button onclick="submitExpense()" class="btn btn-sm btn-primary">Save</button>
+                        <button onclick="hideAddExpense()" class="btn btn-sm btn-outline">Cancel</button>
+                    </div>
+                    <div id="groupExpenses"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/dashboard.html" class="bottom-nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></a>
+        <a href="/charts.html" class="bottom-nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Charts</span></a>
+        <a href="/expenses.html" class="bottom-nav-item"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Create</span></a>
+        <a href="/reports.html" class="bottom-nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>Reports</span></a>
+        <a href="/profile.html" class="bottom-nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></a>
+    </nav>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/groups.js"></script>
+    <script>function toggleDrawer(){document.getElementById('navDrawer').classList.toggle('open')}</script>
+</body>
+</html>

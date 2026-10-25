@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run SplitEase",
+            "request": "launch",
+            "mainClass": "com.expensesplit.App",
+            "classpath": [
+                "${workspaceFolder}/backend/bin",
+                "${workspaceFolder}/backend/lib/*"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}

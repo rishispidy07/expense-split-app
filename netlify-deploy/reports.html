@@ -1,0 +1,255 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - SplitEase</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .page-head{display:flex;align-items:center;justify-content:space-between;padding:32px 0 20px;flex-wrap:wrap;gap:12px}
+        .page-head h1{font-size:1.4rem;font-weight:800}
+        .filter-row{display:flex;gap:8px;align-items:center}
+        .select-input{padding:9px 14px;border:1.5px solid var(--bdr);border-radius:10px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);cursor:pointer;transition:border .15s}
+        .select-input:focus{outline:none;border-color:var(--pri-a);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+
+        .summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+        .summary-box{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:18px 16px;text-align:center;box-shadow:var(--shadow)}
+        .summary-box .s-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+        .summary-box .s-val{font-size:1.15rem;font-weight:800;color:var(--text)}
+        .summary-box .s-lbl{font-size:11px;color:var(--sub);font-weight:500;margin-top:2px}
+
+        .section{background:var(--card);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:20px}
+        .section-head{padding:16px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px}
+        .section-head .s-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .section-head h3{font-size:15px;font-weight:700;flex:1}
+        .section-body{padding:4px 0}
+
+        .cat-row{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--bdr);transition:background .12s}
+        .cat-row:last-child{border:none}
+        .cat-row:hover{background:var(--bg)}
+        .cat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+        .cat-info{flex:1;min-width:0}
+        .cat-name{font-size:14px;font-weight:600;color:var(--text)}
+        .cat-bar-wrap{height:6px;background:var(--bdr);border-radius:3px;margin-top:6px;overflow:hidden}
+        .cat-bar{height:100%;border-radius:3px;transition:width .5s ease}
+        .cat-right{text-align:right;flex-shrink:0}
+        .cat-amount{font-size:14px;font-weight:700;color:var(--text)}
+        .cat-pct{font-size:11px;color:var(--sub);margin-top:1px}
+
+        .trend-row{display:flex;align-items:flex-end;gap:8px;padding:20px;height:180px}
+        .trend-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
+        .trend-bar{width:100%;border-radius:6px 6px 0 0;transition:height .5s ease;min-height:4px;position:relative}
+        .trend-bar:hover{opacity:.85}
+        .trend-label{font-size:11px;color:var(--sub);font-weight:500}
+        .trend-val{font-size:10px;color:var(--text);font-weight:600;white-space:nowrap}
+
+        .hist-item{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--bdr);transition:background .12s}
+        .hist-item:last-child{border:none}
+        .hist-item:hover{background:var(--bg)}
+        .hist-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+        .hist-info{flex:1;min-width:0}
+        .hist-name{font-size:14px;font-weight:600;color:var(--text)}
+        .hist-sub{font-size:12px;color:var(--sub);margin-top:1px}
+        .hist-amount{font-size:14px;font-weight:700;flex-shrink:0;color:var(--red)}
+
+        .empty-state{padding:32px;text-align:center;color:var(--muted);font-size:13px}
+
+        .btn-export{display:flex;align-items:center;gap:6px;padding:10px 18px;border-radius:12px;background:linear-gradient(135deg,#10b981,#34d399);color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(16,185,129,.3);transition:all .2s}
+        .btn-export:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,185,129,.4)}
+        .btn-export svg{filter:drop-shadow(0 1px 2px rgba(0,0,0,.15))}
+
+        .icon-food{background:rgba(245,158,11,.12);color:#f59e0b}
+        .icon-transport{background:rgba(99,102,241,.12);color:#6366f1}
+        .icon-entertainment{background:rgba(236,72,153,.12);color:#ec4899}
+        .icon-shopping{background:rgba(16,185,129,.12);color:#10b981}
+        .icon-bills{background:rgba(239,68,68,.12);color:#ef4444}
+        .icon-health{background:rgba(14,165,233,.12);color:#0ea5e9}
+        .icon-education{background:rgba(139,92,246,.12);color:#8b5cf6}
+        .icon-travel{background:rgba(6,182,212,.12);color:#06b6d4}
+        .icon-groceries{background:rgba(22,163,74,.12);color:#16a34a}
+        .icon-coffee{background:rgba(180,83,9,.12);color:#b45309}
+        .icon-rent{background:rgba(220,38,38,.12);color:#dc2626}
+        .icon-general{background:rgba(107,114,128,.12);color:#6b7280}
+        .icon-income{background:rgba(16,185,129,.12);color:#10b981}
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <button class="nav-menu-btn" onclick="toggleDrawer()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="nav-brand">SplitEase</div>
+        <div class="nav-user">
+            <span id="userName"></span>
+            <button id="logoutBtn" class="btn btn-sm btn-outline">Logout</button>
+        </div>
+    </nav>
+
+<div class="nav-drawer" id="navDrawer">
+    <div class="drawer-overlay" onclick="toggleDrawer()"></div>
+    <div class="drawer-panel">
+        <div class="drawer-header">
+            <div class="drawer-logo">SplitEase</div>
+            <button class="drawer-close" onclick="toggleDrawer()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="drawer-links">
+            <a href="/dashboard.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Home</span>
+            </a>
+            <a href="/groups.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Groups</span>
+            </a>
+            <a href="/settlements.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 7l-5-5-5 5"/></svg>
+                <span>Settlements</span>
+            </a>
+            <a href="/balance.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                <span>Balance</span>
+            </a>
+            <a href="/income.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 7l-5-5-5 5"/></svg>
+                <span>Income</span>
+            </a>
+            <a href="/expenses.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                <span>Expenses</span>
+            </a>
+            <a href="/reports.html" class="drawer-link active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Reports</span>
+            </a>
+            <a href="/charts.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Charts</span>
+            </a>
+            <a href="/profile.html" class="drawer-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Profile</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+    <div class="main-content" style="padding-bottom:100px;">
+        <div class="page-head">
+            <h1>Reports</h1>
+            <div class="filter-row">
+                <select id="yearSelect" class="select-input"></select>
+                <select id="monthSelect" class="select-input">
+                    <option value="0">All Year</option>
+                    <option value="1">Jan</option><option value="2">Feb</option>
+                    <option value="3">Mar</option><option value="4">Apr</option>
+                    <option value="5">May</option><option value="6">Jun</option>
+                    <option value="7">Jul</option><option value="8">Aug</option>
+                    <option value="9">Sep</option><option value="10">Oct</option>
+                    <option value="11">Nov</option><option value="12">Dec</option>
+                </select>
+                <button class="btn-export" onclick="exportCSV()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Extract CSV
+                </button>
+            </div>
+        </div>
+
+        <div class="summary-row">
+            <div class="summary-box">
+                <div class="s-icon" style="background:rgba(239,68,68,.12)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div class="s-val" id="totalSpent">&#8377;0</div>
+                <div class="s-lbl">Total Spent</div>
+            </div>
+            <div class="summary-box">
+                <div class="s-icon" style="background:rgba(99,102,241,.12)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div class="s-val" id="totalEntries">0</div>
+                <div class="s-lbl">Entries</div>
+            </div>
+            <div class="summary-box">
+                <div class="s-icon" style="background:rgba(245,158,11,.12)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                </div>
+                <div class="s-val" id="avgSpend">&#8377;0</div>
+                <div class="s-lbl">Avg / Entry</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-head">
+                <div class="s-icon" style="background:rgba(99,102,241,.12)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                </div>
+                <h3>Category Breakdown</h3>
+            </div>
+            <div class="section-body" id="categoryReport">
+                <p class="empty-state">No data</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-head">
+                <div class="s-icon" style="background:rgba(16,185,129,.12)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                </div>
+                <h3>Monthly Trend</h3>
+            </div>
+            <div class="section-body">
+                <div class="trend-row" id="monthlyTrend">
+                    <p class="empty-state" style="width:100%">No data</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-head">
+                <div class="s-icon" style="background:rgba(239,68,68,.12)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <h3>Recent Expenses</h3>
+            </div>
+            <div class="section-body" id="expenseHistory">
+                <p class="empty-state">No expenses</p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/dashboard.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="/charts.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Charts</span>
+        </a>
+        <a href="/expenses.html" class="bottom-nav-item">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <span>Create</span>
+        </a>
+        <a href="/reports.html" class="bottom-nav-item active">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Reports</span>
+        </a>
+        <a href="/profile.html" class="bottom-nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/reports.js"></script>
+    <script>
+function toggleDrawer() {
+    document.getElementById('navDrawer').classList.toggle('open');
+}
+</script>
+</body>
+</html>

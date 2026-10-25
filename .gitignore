@@ -1,0 +1,22 @@
+# Compiled class files
+bin/
+build/
+*.class
+
+# Log files
+*.log
+
+# Cloudflared tunnel binary
+cloudflared.exe
+
+# Tunnel output files
+tunnel_out.txt
+start_tunnel.bat
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+*.iml
