@@ -1,7 +1,7 @@
 package com.expensesplit.config;
 
 public class Config {
-    public static final int SERVER_PORT = 8080;
+    public static final int SERVER_PORT = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
     public static final String SERVER_HOST = "0.0.0.0";
     public static final String STATIC_FILES_DIR = "frontend";
 
