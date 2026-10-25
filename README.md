@@ -32,24 +32,6 @@ run.bat
 start-public.bat
 ```
 
-## Execution Timeline & Milestones
-
-| Checkpoint | Window Dates | Required Output |
-|---|---|---|
-| Problem statement due Jul 27 | Jul 24 - Jul 27 | Problem statement locked, repository initialized, Tomcat/Maven skeleton running, DB schema v1 |
-| Week 1 | Jul 27 - Aug 2 | Authentication (register/login/session), base DAO layer, project skeleton deployed locally |
-| Week 2 | Aug 3 - Aug 9 | Core flow: group creation, add members, add expense, split calculation |
-| MVP Review | Aug 10 | Working MVP demo |
-| Week 3 | Aug 10 - Aug 16 | Review feedback addressed; group wallet & balance tracking started |
-| Week 4 | Aug 17 - Aug 23 | Group wallet, settlements & balance logic completed; reports module started |
-| Week 5 | Aug 24 - Aug 30 | Search/filter, expense categorization, income tracking |
-| Week 6 | Aug 31 - Sep 6 | Charts & Reports, edge case handling, input validation |
-| Week 7 | Sep 7 - Sep 13 | Security requirements implemented; unit and DAO test coverage completed |
-| Week 8 / Deploy link due Sep 21 | Sep 14 - Sep 20 | Deployment finalized; live URL smoke-tested |
-| 2nd Review | Sep 21 - Sep 27 | AI chatbot integration - backend proxy servlet + widget |
-| Week 10 | Sep 28 - Oct 4 | Chatbot refinement, UI polish, README/architecture documentation |
-| Final Review Oct 10 | Oct 5 - Oct 10 | Final regression pass, report, slide deck, rehearsed demo |
-
 ## ER Diagram
 ```mermaid
 erDiagram
